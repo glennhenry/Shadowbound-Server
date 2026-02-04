@@ -16,9 +16,15 @@ import server.messaging.socket.SocketMessage
 import server.messaging.socket.SocketMessageDispatcher
 import utils.functions.hexString
 import utils.functions.safeAsciiString
+import utils.functions.startsWithBytes
 import utils.logging.Logger
 import utils.logging.Logger.LOG_INDENT_PREFIX
 import kotlin.system.measureTimeMillis
+
+val POLICY_FILE_REQUEST = "<policy-file-request/>".toByteArray()
+val POLICY_FILE_RESPONSE =
+    "<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"7777\"/></cross-domain-policy>\u0000".toByteArray()
+
 
 data class GameServerConfig(
     val host: String = SERVER_ADDRESS,
@@ -95,6 +101,13 @@ class GameServer(
                 loop@ while (isActive) {
                     val (bytesRead, data) = connection.read()
                     if (bytesRead <= 0) break@loop
+
+                    // response to policy request, then client will disconnect
+                    if (data.startsWithBytes(POLICY_FILE_REQUEST)) {
+                        Logger.debug { "[SOCKET] Policy file requested" }
+                        connection.write(POLICY_FILE_RESPONSE)
+                        return@launch
+                    }
 
                     serverContext.onlinePlayerRegistry.updateLastActivity(connection.playerId)
 
@@ -175,6 +188,9 @@ class GameServer(
             buildString {
                 appendLine("=====> [SOCKET RECEIVE]")
                 appendLine("$LOG_INDENT_PREFIX playerId  : ${connection.playerId}")
+                if (connection.playerId == "[Undetermined]") {
+                    appendLine("$LOG_INDENT_PREFIX address   : ${connection.remoteAddress}")
+                }
                 appendLine("$LOG_INDENT_PREFIX bytes     : ${data.size}")
                 appendLine("$LOG_INDENT_PREFIX raw       : ${data.safeAsciiString()}")
                 append("$LOG_INDENT_PREFIX raw (hex) : ${data.hexString()}")
