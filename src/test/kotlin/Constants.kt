@@ -1,0 +1,1 @@
+const val SHADOWBOUND_TEST_DB_NAME = "SHADOWBOUND-test-DB"
