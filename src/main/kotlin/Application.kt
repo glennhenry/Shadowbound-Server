@@ -75,9 +75,9 @@ suspend fun Application.module() {
             useForegroundColor = config().getBoolean("logger.useForegroundColor", original.useForegroundColor),
             fileNamePadding = config().getInt("logger.maximumFileNameLength", original.fileNamePadding),
             tagPadding = config().getInt("logger.tagPadding", original.tagPadding),
-            maximumLogMessageLength = config().getInt(
+            maximumLogMessageLineLength = config().getInt(
                 "logger.maximumLogMessageLength",
-                original.maximumLogMessageLength
+                original.maximumLogMessageLineLength
             ),
             maximumLogFileSize = config().getInt("logger.maximumLogFileSize", original.maximumLogFileSize),
             maximumLogFileRotation = config().getInt("logger.maximumLogFileRotation", original.maximumLogFileRotation),

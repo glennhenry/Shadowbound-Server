@@ -97,23 +97,28 @@ object Logger : ILogger {
 
     override fun verbose(tag: String, msg: String, logFull: Boolean) = verbose(tag, logFull) { msg }
     override fun verbose(tag: String, logFull: Boolean, msg: () -> String) = verbose(tag, logFull, Default, msg)
-    override fun verbose(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) = log(tag, logFull, targets, LogLevel.Verbose, msg)
+    override fun verbose(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) =
+        log(tag, logFull, targets, LogLevel.Verbose, msg)
 
     override fun debug(tag: String, msg: String, logFull: Boolean) = debug(tag, logFull) { msg }
     override fun debug(tag: String, logFull: Boolean, msg: () -> String) = debug(tag, logFull, Default, msg)
-    override fun debug(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) = log(tag, logFull, targets, LogLevel.Debug, msg)
+    override fun debug(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) =
+        log(tag, logFull, targets, LogLevel.Debug, msg)
 
     override fun info(tag: String, msg: String, logFull: Boolean) = info(tag, logFull) { msg }
     override fun info(tag: String, logFull: Boolean, msg: () -> String) = info(tag, logFull, Default, msg)
-    override fun info(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) = log(tag, logFull, targets, LogLevel.Info, msg)
+    override fun info(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) =
+        log(tag, logFull, targets, LogLevel.Info, msg)
 
     override fun warn(tag: String, msg: String, logFull: Boolean) = warn(tag, logFull) { msg }
     override fun warn(tag: String, logFull: Boolean, msg: () -> String) = warn(tag, logFull, Default, msg)
-    override fun warn(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) = log(tag, logFull, targets, LogLevel.Warn, msg)
+    override fun warn(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) =
+        log(tag, logFull, targets, LogLevel.Warn, msg)
 
     override fun error(tag: String, msg: String, logFull: Boolean) = error(tag, logFull) { msg }
     override fun error(tag: String, logFull: Boolean, msg: () -> String) = error(tag, logFull, Default, msg)
-    override fun error(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) = log(tag, logFull, targets, LogLevel.Error, msg)
+    override fun error(tag: String, logFull: Boolean, targets: Set<LogTarget>, msg: () -> String) =
+        log(tag, logFull, targets, LogLevel.Error, msg)
 
     private fun log(
         tag: String,
@@ -124,13 +129,15 @@ object Logger : ILogger {
     ) {
         if (level < settings.minimumLevel) return
 
-        val rawMsg = msg().let {
-            if (it.length > settings.maximumLogMessageLength && !logFull) {
-                "${it.take(settings.maximumLogMessageLength)}... [truncated]"
-            } else {
-                it
+        val rawMsg = msg()
+            .lineSequence()
+            .joinToString("\n") { line ->
+                if (!logFull && line.length > settings.maximumLogMessageLineLength) {
+                    line.take(settings.maximumLogMessageLineLength) + " <...truncated>"
+                } else {
+                    line
+                }
             }
-        }
 
         logQueue.offer(LogCall(tag, level, targets, buildSourceHint(), rawMsg))
     }
@@ -192,7 +199,10 @@ object Logger : ILogger {
                             writeToFile(target.file, message)
                         }
 
-                        LogTarget.Client -> {}
+                        LogTarget.Client -> {
+                            // currently disabled
+                            // REPLACE
+                        }
                     }
                 }
             }
@@ -335,7 +345,7 @@ data class LoggerSettings(
     val useForegroundColor: Boolean = false,
     val fileNamePadding: Int = 25,
     val tagPadding: Int = 20,
-    val maximumLogMessageLength: Int = 500,
+    val maximumLogMessageLineLength: Int = 500,
     val maximumLogFileSize: Int = 5 * 1024 * 1024,
     val maximumLogFileRotation: Int = 5,
     val logDateFormatter: SimpleDateFormat = SimpleDateFormat("HH:mm:ss.SSS"),
