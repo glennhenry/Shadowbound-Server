@@ -1,6 +1,6 @@
 # Shadowbound Server
 
-<img src="progress.png" alt="gameplay image" width=400/>
+<img src="progress.png" alt="gameplay image" width=500/>
 
 Server emulator for Shadowbound, published globally by R2Games, closed in 2021.
 
