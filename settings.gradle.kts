@@ -1,4 +1,4 @@
-rootProject.name = "Encore"
+rootProject.name = "Shadowbound-Server"
 
 dependencyResolutionManagement {
     repositories {

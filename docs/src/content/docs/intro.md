@@ -4,8 +4,8 @@ slug: index
 description: Intro
 ---
 
-Documentation about X.
+Shadowbound documentation.
 
-![Gameplay](../../assets/Encore.png)
+![Shadowbound poster](../../assets/gameplay.jpg)
 
-See [flow](./flow).
+Nothing.
