@@ -18,12 +18,17 @@ import encore.network.transport.Connection
 import encore.network.transport.DefaultConnection
 import encore.utils.hexString
 import encore.utils.safeAsciiString
+import encore.utils.startsWithBytes
 import encore.utils.support.className
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.ClosedByteChannelException
 import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
+
+val POLICY_FILE_REQUEST = "<policy-file-request/>".toByteArray()
+val POLICY_FILE_RESPONSE =
+    "<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"7777\"/></cross-domain-policy>\u0000".toByteArray()
 
 /**
  * The [Stage] implementation handling TCP socket connections used for main gameplay.
@@ -118,6 +123,13 @@ class GameStage(
                 loop@ while (isActive) {
                     val (bytesRead, data) = connection.read()
                     if (bytesRead <= 0) break@loop
+
+                    // response to policy request, then client will disconnect
+                    if (data.startsWithBytes(POLICY_FILE_REQUEST)) {
+                        Fancam.debug(Tags.Socket) { "[SOCKET] Policy file requested and sent" }
+                        connection.write(POLICY_FILE_RESPONSE)
+                        return@launch
+                    }
 
                     playerLifecycleHandler.onReceive(serverContext, connection)
 
