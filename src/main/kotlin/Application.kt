@@ -20,7 +20,7 @@ import encore.venue.Venue
 import encore.websocket.handler.WsCommandHandler
 import game.GameIdentity
 import game.Globals
-import game.fileRoutes
+import game.routes.fileRoutes
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
