@@ -4,7 +4,7 @@
 
 Server emulator for Shadowbound, published globally by R2Games, closed in 2021.
 
-Currently, the server barely works as it is still a work in progress. We are in the loading screen still and gathering game assets.
+The server is not working and this project is already abandoned. Last progress was stuck on loading screen and still figuring out serialization. We were also gathering game assets.
 
 *This project tries to reconstruct the game server-side behavior. Client files and assets are not included. This project is not official and is not associated with the original creators.*
 
